@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/layui_ext/dtree/dtree.css">
+    <link rel="stylesheet" href="/static/layui_ext/dtree/font/dtreefont.css">
+    <link rel="stylesheet" href="/static/css/public.css" media="all" />
+</head>
+<body class="main_body" style="margin-left: 2px">
+                <!--查询条件区域-->
+                <blockquote class="layui-elem-quote">
+                    <form class="layui-form  layui-form-pane" action="" id="searchFrm" lay-filter="searchFrm" method="post">
+                        <div class="layui-form-item">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">客户名称</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="customername" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">客户电话</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="telephone" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline">
+                                <label class="layui-form-label">联系人</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="connectionperson" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-inline" style="margin-left:20px">
+                                <div class="layui-input-block" >
+                                    <button  type="button" class="layui-btn  layui-btn-lg"  lay-submit lay-filter="doSerach"><span class="layui-icon layui-icon-search"></span>搜索</button>
+                                    <button  type="reset"  class="layui-btn  layui-btn-lg  layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </blockquote>
+            </div>
+ <!--数据表格区域-->
+        <div>
+            <table class="layui--hide" id="customerTable" lay-filter="customerTable"></table>
+            <div id="customerToolBar" style="display: none">
+                <button type="button" class="layui-btn layui-bg-blue" lay-event="add"><span class="layui-icon layui-icon-add-1"></span>添加客户</button>
+                <button type="button" class="layui-btn layui-bg-blue" lay-event="batchDelete"><span class="layui-icon layui-icon-add-1"></span>批量删除</button>
+            </div>
+            <div id="customerRowBar" style="display:none;">
+                <button  type="button"  class="layui-btn layui-btn-xs layui-bg-red" lay-event="Delete"><span class="layui-icon layui-icon-delete"></span>删除</button>
+                <button  type="button"  class="layui-btn layui-btn-xs layui-bg-orange" lay-event="update"><span class="layui-icon layui-icon-edit"></span>修改</button>
+            </div>
+        </div>
+    <!--添加和修改的弹出层-->
+    <div style="display: none;padding: 5px" id="addOrUpdateDiv" class="">
+        <form action="" method="post" class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
+           <input name="id" type="hidden">
+            <div class="layui-form-item">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                <label class="layui-form-label">客户名称</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="id">
+                    <input type="text" name="customername" required  lay-verify="required" placeholder="请输入客户名称" autocomplete="off" class="layui-input">
+                </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">公司电话</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="zip" required  lay-verify="required" placeholder="请输入公司电话" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+                <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">邮编</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="zip" required  lay-verify="required" placeholder="请输入邮编" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">邮箱</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="email" required  lay-verify="required" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                </div>
+
+
+                <div class="layui-block">
+                     <label class="layui-form-label">公司地址</label>
+                     <div class="layui-input-block">
+                         <input type="text" name="address" required  lay-verify="required" placeholder="请输入公司地址" autocomplete="off" class="layui-input">
+                 </div>
+                </div>
+
+
+             <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">客户电话</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="telephone" required  lay-verify="required" placeholder="请输入客户电话" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                <label class="layui-form-label">联系人</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="connectionperson" required  lay-verify="required" placeholder="请输入联系人" autocomplete="off" class="layui-input">
+                </div>
+                </div>
+                <div class="layui-inline">
+                <label class="layui-form-label">联系人电话</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="phone" required  lay-verify="required" placeholder="请输入联系人电话" autocomplete="off" class="layui-input">
+                </div>
+                </div>
+            </div>
+
+                    <div class="layui-form-item">
+                <div class="layui-inline">
+                <label class="layui-form-label">开户银行</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bank" required  lay-verify="required" placeholder="请输入开户银行" autocomplete="off" class="layui-input">
+                </div>
+                </div>
+                <div class="layui-inline">
+                <label class="layui-form-label">账号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="account" required  lay-verify="required" placeholder="请输入银行卡账号" autocomplete="off" class="layui-input">
+                </div>
+                </div>
+                <div class="layui-inline">
+                <label class="layui-form-label">传真</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="fax" required  lay-verify="required" placeholder="请输入传真" autocomplete="off" class="layui-input">
+                </div>
+                </div>
+            </div>
+                <label class="layui-form-label">状态</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="available" value="1" title="可用" checked/>
+                    <input type="radio" name="available" value="0" title="不可用" />
+                </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="text-align: center">
+                    <button  type="button" class="layui-btn  layui-btn-lg"  lay-submit lay-filter="doSubmit" id="doSubmit"><span class="layui-icon layui-icon-search"></span>提交</button>
+                    <button  type="reset"  class="layui-btn  layui-btn-lg  layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/html" id="switchAvailable">
+    <!-- 这里的 checked 的状态只是演示 -->
+    {{#  if(d.available==1){ }}
+    <input type="checkbox" checked  name="available" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="available" />
+    {{#  } else { }}
+    <input type="checkbox" name="available" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="available" />
+    {{#  } }}
+</script>
+
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/javascript" th:inline="none">
+
+    layui.use(['layer','jquery','form','table'], function() {
+        var layer = layui.layer;
+        $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;
+
+
+
+        //加载数据
+        var tableIns = table.render({
+             elem: '#customerTable'
+            , url: '/customer/toCustomerManager'
+            , toolbar: '#customerToolBar' //开启头部工具栏,并为其绑定左侧模板
+            , title: '客户数据表'
+            , page: true //开启分页
+            , limits: [10, 20, 50, 100]
+            , cols: [[
+                {type:'checkbox',align: 'center'},
+                {field: 'id', title: 'ID', align: 'center', sort: true, width: '100'},
+                {field: 'customername', title: '客户名称', align: 'center', sort: true, width: '100'},
+                {field: 'zip', title: '邮编', align: 'center', sort: true, width: '150'},
+                {field: 'address', title: '地址', align: 'center', sort: true, width: '150'},
+                {field: 'telephone', title: '客户电话', align: 'center', sort: true, width: '150'},
+
+                {
+                    field: 'connectionperson',
+                    title: '是否可用',
+                    align: 'center',
+                    sort: true,
+                    width: '80',
+                },
+                {field: 'phone', title: '联系人电话', align: 'center', sort: true, width: '120'},
+                {field: 'bank', title: '开户银行', align: 'center', sort: true, width: '150'},
+                {field: 'account', title: '开户账号', align: 'center', sort: true, width: '150'},
+                {field: 'email', title: '邮箱', align: 'center', sort: true, width: '80'},
+                {field: 'fax', title: '客户编码', align: 'center', sort: true, width: '80'},
+                {field: 'available', title: '是否可用', align: 'center', sort: true, width: '80',templet:'#switchAvailable'},
+                {fixed: 'right', title: '操作', toolbar: '#customerRowBar', width: 200},
+             ]],
+            done:function (res,curr,count) {
+                if (res.data.length==0 && curr!=1){
+                    tableIns.reload({
+                        page:{
+                            curr:(curr-1)
+                        }
+                    })
+                }
+            }
+        });
+
+
+
+
+
+        //模糊查询
+        form.on('submit(doSerach)', function (data) {
+            tableIns.reload({
+                where: data.field,
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+
+        //监听行工具条的事件
+        table.on("tool(customerTable)", function (obj) {
+            var data = obj.data; //获得当前行数据
+            switch (obj.event) {
+                case 'Delete':
+                    deleteCustomer(data);
+                    break;
+                case 'update':
+                    openUpdateCustomerLayer(data);
+                    break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('toolbar(customerTable)', function (obj) {
+            switch (obj.event) {
+                case 'add':
+                    openAddLayer();
+                    break;
+                case 'batchDelete':
+                    batchDelete();
+                    break;
+            }
+        });
+
+        var mainIndex;
+        var url;
+
+
+
+
+
+        //打开添加的弹出层
+        function openAddLayer() {
+            mainIndex=layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),
+                area:['800px','520px'],
+                title:'添加菜单',
+                success:function () {
+                    $("#dataFrm")[0].reset();
+                    url = "/customer/addCustomer";
+                }
+            });
+
+        }
+
+
+        //打开修改的弹出层
+        function openUpdateCustomerLayer(data) {
+            mainIndex = layer.open({
+                type: 1,
+                content: $("#addOrUpdateDiv"),
+                area: ['800px', '520px'],
+                title: '修改菜单',
+                success: function () {
+                    $("#dataFrm")[0].reset();
+                    //给表单元素赋值
+                    form.val('dataFrm',data);
+                    url = "/customer/updateCustomer";
+                }
+            });
+        }
+
+        //添加和修改
+        form.on('submit(doSubmit)',function () {
+            var data = $("#dataFrm").serialize();
+                $.post(url, data, function (res) {
+                    if (res.code == 200) {
+                        tableIns.reload();
+                    }
+                    layer.msg(res.msg);
+                    layer.close(mainIndex);
+                });
+            return false;
+        });
+
+
+
+
+
+        //删除
+        function deleteCustomer(data) {
+            layer.confirm("你确定要删除这个菜单吗", {icon: 3, title: '提示'}, function (index) {
+                $.post("/customer/deleteCustomer", {id: data.id}, function (res) {
+                    if (res.code == 200) {
+                        tableIns.reload();
+                    }
+                    layer.msg(res.msg);
+                    layer.close(index);
+                });
+
+            });
+        }
+
+
+        //批量删除
+        function batchDelete() {
+            //得到选中行
+            var  checkStatus=table.checkStatus('customerTable');
+            var dataLength=checkStatus.data.length;
+            if (dataLength>0){
+                //获取选中行的数据
+                var data=checkStatus.data;
+                var Ids=[];
+                for (var i in data){
+                    Ids.push(data[i].id);
+                }
+                //alert(Ids)
+                layer.confirm("你确定要删除这些数据吗?",{icon:3,title:'提示'},function (index) {
+                    $.post("/customer/batchdeleteCustomer","Ids="+Ids,function (res) {
+                        if (res.code==200){
+                            tableIns.reload();
+                        }
+                        layer.msg(res.msg);
+                        layer.close(index);
+                    });
+                });
+            }else {
+                layer.msg("请选择操作");
+            }
+        }
+
+    });
+
+
+
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.warehouse.mapper.NoticeMapper">
+  <resultMap id="BaseResultMap" type="com.ch.warehouse.entity.Notice">
+    <!--@mbg.generated-->
+    <!--@Table sys_notice-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="opername" jdbcType="VARCHAR" property="opername" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, title, content, createtime, opername
+  </sql>
+
+  <sql id="batchQuery">
+    <where>
+      <if test="opername!=null and opername!=''">
+         opername like concat('%',#{opername},'%')
+      </if>
+      <if test="title!=null and title!=''">
+       and title like concat('%',#{title},'%')
+      </if>
+      <if test="createtime!=null and createtime!=''">
+       and createtime between #{startTime} and #{endTime}
+    </if>
+    </where>
+  </sql>
+  <select id="pageQuery" parameterType="Integer" resultType="Notice">
+   select * from warehouse.sys_notice
+   order by createtime desc
+   limit #{current},#{size}
+  </select>
+
+  <select id="noticeCount"  resultType="Integer">
+    select count(*) from warehouse.sys_notice <include refid="batchQuery">
+  </include>
+  </select>
+
+  <select id="batchQuerys" parameterType="Integer" resultType="Notice">
+    select * from warehouse.sys_notice
+    <include refid="batchQuery"/>
+    order by createtime desc
+    limit #{current},#{size}
+  </select>
+</mapper>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <title>layui后台管理模板 2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="/static/css/public.css" media="all" />
+    <link rel="stylesheet" href="/static/layui_ext/dtree/dtree.css">
+    <link rel="stylesheet" href="/static/layui_ext/dtree/font/dtreefont.css">
+</head>
+<body class="main_body" style="margin-left: 2px">
+<!--查询条件区域-->
+<blockquote class="layui-elem-quote">
+    <form class="layui-form  layui-form-pane" action="" id="searchFrm" lay-filter="searchFrm" method="post">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">角色名字</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name"   class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">是否可用</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="available" value="1" title="是" checked>
+                    <input type="radio" name="available" value="0" title="否">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">角色权限</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="remark"   class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline" style="margin-left:20px">
+                <div class="layui-input-block" >
+                    <button  type="button" class="layui-btn  layui-btn-lg"  lay-submit lay-filter="doSerach"><span class="layui-icon layui-icon-search"></span>提交</button>
+                    <button  type="reset"  class="layui-btn  layui-btn-lg  layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</blockquote>
+<!--数据表格区域-->
+<div>
+    <table class="layui--hide" id="loginfoTable" lay-filter="loginfoTable"></table>
+    <div id="loginfoToolBar" style="display: none">
+               <button type="button" class="layui-btn layui-bg-blue" lay-event="add"><span class="layui-icon layui-icon-add-1"></span>添加角色</button>
+    </div>
+    <div id="loginfoRowBar" style="display:none;">
+        <button  type="button"  class="layui-btn layui-btn-xs layui-bg-red" lay-event="Delete"><span class="layui-icon layui-icon-delete"></span>删除</button>
+        <button  type="button"  class="layui-btn layui-btn-xs layui-bg-orange" lay-event="update"><span class="layui-icon layui-icon-edit"></span>更新</button>
+        <button  type="button"  class="layui-btn layui-btn-xs layui-bg-green" lay-event="roleAddPermission"><span class="layui-icon layui-icon-about"></span>设置权限</button>
+    </div>
+</div>
+
+<!--添加和修改的弹出层-->
+<div style="display: none;padding: 5px" id="addOrUpdateDiv" class="">
+    <form action="" method="post" class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
+         <input type="hidden" name="id">
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名字</label>
+            <div class="layui-input-block">
+                <input type="text" name="name"   class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色权限</label>
+            <div class="layui-input-block">
+                <input type="text" name="remark"    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否可用</label>
+            <div class="layui-input-block">
+                <input type="radio" name="available" value="1" title="是" checked>
+                <input type="radio" name="available" value="0" title="否">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center">
+                <button  type="button" class="layui-btn  layui-btn-lg" lay-filter="doSubmit"  lay-submit id="doSubmit"><span class="layui-icon layui-icon-search"></span>提交</button>
+                <button  type="reset"  class="layui-btn  layui-btn-lg  layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--给角色添加权限弹出层-->
+<div style="display: none;padding: 5px" id="roleAddPermission">
+    <ul style="height:500px" id="dataTree" class="dtree" data-id="0"></ul>
+</div>
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/html" id="switchAvailable">
+    <!-- 这里的 checked 的状态只是演示 -->
+    {{#  if(d.available==1){ }}
+    <input type="checkbox" checked  name="available" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="available" />
+    {{#  } else { }}
+    <input type="checkbox" name="available" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="available" />
+    {{#  } }}
+</script>
+<script type="text/javascript" th:inline="none">
+    layui.config({
+        base: '/static/layui_ext/dtree/'   // {/}的意思即代表采用自有路径，即不跟随 base 路径
+    }).extend({
+        dtree: 'dtree'//定义组件模块名
+    }).use(['dtree','layer','jquery','form','table','laydate'], function() {
+        var dtree = layui.dtree;
+        var layer = layui.layer;
+        $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;
+        var laydate=layui.laydate;
+
+
+        //初始化时间选择器
+        laydate.render({
+            elem:'#createtime',
+            type:'datetime'
+        });
+
+
+
+
+        //加载数据
+        var tableIns=table.render({
+            elem: '#loginfoTable'
+            , url: '/role/toRoleManager'
+            , toolbar: '#loginfoToolBar' //开启头部工具栏,并为其绑定左侧模板
+            , title: '用户登录日志数据表'
+            , page: true //开启分页
+            , limits: [10, 20, 50, 100]
+            , cols: [[
+                {type: 'checkbox', fixed: 'left'},
+                {field: 'id', title: 'ID', align: 'center', sort: true},
+                {field: 'name', title: '角色姓名', align: 'center', sort: true},
+                {field: 'remark', title: '角色权限', align: 'center', sort: true},
+                {
+                    field: 'available',
+                    title: '是否可用',
+                    align: 'center',
+                    sort: true,
+                    templet: '#switchAvailable'
+                },
+                {
+                    field: 'createtime',
+                    title: '发布时间',
+                    align: 'center',
+                    sort: true,
+                    templet: '<div>{{ layui.util.toDateString(d.createtime, "yyyy-MM-dd HH:mm:ss") }}</div>'
+                },
+                {fixed: 'right', title: '操作', toolbar: '#loginfoRowBar', width: 250},
+            ]]
+        });
+
+        //模糊查询
+        form.on('submit(doSerach)',function (data) {
+            tableIns.reload({
+                where:data.field,
+                page:{
+                    curr:1
+                }
+            });
+            return false;
+        });
+
+        form.on('switch(availables)',function (data) {
+            console.log(data.elem); //得到checkbox原始DOM对象
+            console.log(data.elem.checked); //开关是否开启，true或者false
+            console.log(data.value); //开关value值，也可以通过data.elem.value得到
+            console.log(data.othis); //得到美化后的DOM对象
+
+        })
+
+        //监听行工具条的事件
+        table.on("tool(loginfoTable)",function (obj) {
+            var data=obj.data; //获得当前行数据
+            switch (obj.event) {
+                case 'Delete':
+                    deleteRole(data);
+                    break;
+                case 'update':
+                    openUpdateRoleLayer(data);
+                    break;
+                case 'roleAddPermission':
+                    roleAddPermission(data);
+                  break;
+            }
+        });
+
+        //监听行工具事件
+        table.on('toolbar(loginfoTable)',function (obj) {
+            switch (obj.event) {
+                case 'batchDelete':
+                    batchDelete();
+                    break;
+                case 'add':
+                    openAddLayer();
+                    break;
+            }
+        });
+
+        var mainIndex;
+        var url;
+        var indexs;
+        //打开添加的弹出层
+        function openAddLayer() {
+            mainIndex=layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),
+                area:['800px','520px'],
+                title:'添加角色',
+                success:function () {
+                    $("#dataFrm")[0].reset();
+                    url = "/role/addRole";
+                }
+            });
+
+        }
+
+        //打开修改的弹出层
+        function openUpdateRoleLayer(data) {
+            mainIndex=layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),
+                area:['800px','520px'],
+                title:'修改角色',
+                success:function () {
+                    $("#dataFrm")[0].reset();
+                    form.val('dataFrm',data);
+                    url="/role/updateRole";
+                }
+            });
+        }
+
+
+        form.on('submit(doSubmit)',function () {
+            var data=$("#dataFrm").serialize();
+                $.post(url,data,function (res) {
+
+                    if (res.code==200){
+                        tableIns.reload();
+                    }
+                    layer.msg(res.msg);
+                    layer.close(mainIndex);
+                });
+                return false;
+        })
+
+
+
+
+
+        //删除
+        function deleteRole(data) {
+            layer.confirm("你确定要删除这条数据吗",{icon:3,title:'提示'},function (index) {
+                $.post("/role/deleteRole",{id:data.id},function (res) {
+                    if (res.code==200){
+                        tableIns.reload();
+                    }
+                    layer.msg(res.msg);
+                    layer.close(index);
+                });
+
+            });
+        }
+
+        //打开分配角色页面
+         function roleAddPermission(data) {
+           mainIndex=layer.open({
+               type:1,
+               content:$("#roleAddPermission"),
+               area:['400px',"500px"],
+               title:'分配['+data.name+']的权限',
+               btn: ['<span class="layui-icon">&#xe605;确认分配</span>', '<span class="layui-icon">&#x1006;取消</span>'],
+               yes: function(index, layero){
+                  //得到树选中的所有的节点
+                   var permissionData = dtree.getCheckbarNodesParam("dataTree");
+                   var params="rid="+data.id;
+                   $.each(permissionData,function (index,item) {
+                    params +="&ids="+item.nodeId;
+                   });
+                   $.post("/role/saveRolePermission",params,function (res) {
+                     layer.msg(res.msg);
+                     layer.close(mainIndex);
+                   })
+                   return false;
+               }
+             ,btn2: function(index, layero){
+
+             },
+               btnAlign:'c',
+               success:function () {
+                   dtree.render({
+                       elem: "#dataTree",
+                       url: "/role/initPermissionByRole?roleId="+data.id,
+                       dataStyle: "layuiStyle", //使用layui风格的数据格式
+                       dataFormat: "list", //配置data的风格
+                       response: {message: "msg", statusCode: 0},
+                       checkbar: true,
+                       checkbarType: "all" // 默认就是all，其他的值为： no-all  p-casc   self  only
+                   });
+               }
+           })
+         }
+
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<title>个人资料</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="/static/layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="/static/css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form layui-row" id="userForm" lay-filter="userForm">
+	<input name="id" type="hidden">
+	<div class="layui-col-md3 layui-col-xs12 user_right">
+		<div class="layui-upload-list">
+			<input type="hidden" name="headimg" id="headimg">
+			<img class="layui-upload-img layui-circle userFaceBtn userAvatar" id="userFace">
+		</div>
+		<button type="button" class="layui-btn layui-btn-primary userFaceBtn"><i class="layui-icon">&#xe67c;</i>更换头像</button>
+	</div>
+	<div class="layui-col-md6 layui-col-xs12">
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户组</label>
+			<div class="layui-input-block">
+				<input type="text"  id="remark" disabled class="layui-input layui-disabled">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">用户名</label>
+			<div class="layui-input-block">
+				<input type="text" name="username"  class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">真实姓名</label>
+			<div class="layui-input-block">
+				<input type="text" name="trueName" id="trueName" placeholder="请输入真实姓名" lay-verify="required" class="layui-input realName">
+			</div>
+		</div>
+		<div class="layui-form-item" pane="">
+			<label class="layui-form-label">性别</label>
+			<div class="layui-input-block userSex">
+				<input type="radio" name="sex" value="0" title="男">
+				<input type="radio" name="sex" value="1" title="女">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">手机号码</label>
+			<div class="layui-input-block">
+				<input type="tel" name="phone" placeholder="请输入手机号码" lay-verify="phone" class="layui-input userPhone">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">出生年月</label>
+			<div class="layui-input-block">
+				<input type="text" name="birthday" id="birthday" placeholder="请输入出生年月" readonly class="layui-input">
+			</div>
+		</div>
+		<div class="layui-form-item userAddress">
+			<label class="layui-form-label">家庭住址</label>
+			<div class="layui-input-inline">
+				<select name="province" id="province" lay-filter="province" class="province">
+					<option value="">请选择省份</option>
+				</select>
+			</div>
+			<div class="layui-input-inline">
+				<select name="city" id="city" lay-filter="city">
+					<option value="">请选择市</option>
+				</select>
+			</div>
+			<div class="layui-input-inline">
+				<select name="area" id="area" lay-filter="area">
+					<option value="">请选择县/区</option>
+				</select>
+			</div>
+		</div>
+		</div>
+
+		<div class="layui-form-item">
+			<label class="layui-form-label">掌握技术</label>
+			<div class="layui-input-block userHobby">
+				<input type="checkbox" name="masterSkill"  value="1" title="Javascript">
+				<input type="checkbox" name="masterSkill"  value="2" title="java">
+				<input type="checkbox" name="masterSkill"  value="3" title="spring">
+				<input type="checkbox" name="masterSkill"  value="4" title="HTML(5)">
+				<input type="checkbox" name="masterSkill"  value="5" title="CSS(3)">
+				<input type="checkbox" name="masterSkill"  value="6" title="mybatis">
+				<input type="checkbox" name="masterSkill"  value="7" title="springboot">
+				<input type="checkbox" name="masterSkill"  value="8" title="springCloud">
+				<input type="checkbox" name="masterSkill"  value="9" title="VUE">
+				<input type="checkbox" name="masterSkill"  value="10" title="layui">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">邮箱</label>
+			<div class="layui-input-block">
+				<input type="text" name="email" placeholder="请输入邮箱" lay-verify="email" class="layui-input userEmail">
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">自我评价</label>
+			<div class="layui-input-block">
+				<textarea placeholder="请输入内容" name="selfAssessment" class="layui-textarea myself"></textarea>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<div class="layui-input-block">
+				<button type="button" class="layui-btn" lay-submit  lay-filter="changeUser">立即提交</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			</div>
+		</div>
+	</div>
+</form>
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/javascript" th:inline="none">
+	layui.use(['form','layer','jquery','upload','laydate'],function(){
+		var  layer=layui.layer;
+		    form = layui.form,
+			upload=layui.upload,
+			laydate=layui.laydate;
+	      	$ = layui.jquery;
+
+           //初始化日期
+          laydate.render({
+			  elem:'#birthday',
+			  type:'date'
+		  });
+
+
+		//保存父id
+		let parentId;
+
+
+		$.post("/userinfo/queryUserInfo",function (data) {
+
+			    $("#remark").val(data.data[0]);
+				var formdata = data.data[1];
+
+
+				   //获得图片地址
+				  var headimgs = formdata.headimg;
+				  //给头像的src属性赋值
+			      $("#userFace").attr("src","/file/showImageByPath?path="+headimgs);
+
+
+
+
+				//获得传递过来的地址里面的三个省市区id
+				var address = formdata.address;
+
+			    if (null!=formdata){
+			    	//设置一个数组保存地址字符串
+					var addressArr=[];
+					addressArr=address.split(",");
+					//传递给后台的是省市区三个的id
+					$.get("/userinfo/districts","ids="+addressArr,function (res) {
+						var data1 = res.data;
+						//把取出来的三条数据,放入省市区三个方法中进行赋值
+						province(data1[0].id);
+						city(data1[0].id,data1[1].id);
+						district(data1[1].id,data1[2].id);
+						form.render("select");
+					});
+
+				   //设置一个数组存储数据库传递过来的值
+				    var levelType=[];
+					levelType=formdata.masterSkill.split(",");
+					//获取页面上name值为masterSkill的复选框
+					var checkboxs=$("input[name='masterSkill']");
+					for (var i = 0; i <checkboxs.length ; i++) {
+						for (var j=0;j<levelType.length;j++){
+							//根据当前的value值跟数据库存储的值比较,相等的话,就选中复选框
+							 if (levelType[j]==checkboxs[i].value){
+								 checkboxs[i].checked=true;
+							 }
+						}
+					}
+					form.render();
+					//为form表单元素赋值
+					form.val('userForm',formdata);
+				}
+		})
+
+
+
+		//点击省份下拉框值时,触发市级下拉框的值
+		form.on('select(province)',function () {
+			//清除市下拉框的所有选项
+			$("#city").empty();
+			$("#area").empty();
+			//获取省下拉框当前的value值
+			parentId = $("#province").val();
+			city(parentId);
+			form.render("select");
+
+		})
+
+
+		//点击市级下拉框值时,触发区级下拉框的值
+		form.on('select(city)',function () {
+			//清除市下拉框的所有选项
+			$("#area").empty();
+			//获取省下拉框当前的value值
+			parentId = $("#city").val();
+			district(parentId);
+			form.render("select");
+
+		})
+
+
+         //初始化省级市级区级下拉框赋值
+		function province(provinceId){
+			$.get("/userinfo/district",{pid:0},function (res) {
+				var data = res.data;
+				for (var i=0;i<data.length;i++) {
+					//把初始化的所有省id与当前的省id做比较,相等的话,就默认选中
+					if (data[i].id==provinceId){
+						$("#province").append("<option value='"+data[i].id+"' selected>"+data[i].name+"</option>");
+					}else {
+						$("#province").append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+					}
+				}
+				form.render("select");
+			});
+		}
+
+
+     function city(parentId,ids){
+		 $.get("/userinfo/district",{pid:parentId},function (res) {
+			 var data= res.data;
+
+			 for (var i=0;i<data.length;i++) {
+				 //把初始化的所有市id与当前的省id做比较,相等的话,就默认选中
+			 	if (data[i].id==ids){
+					$("#city").append("<option value='"+data[i].id+"' selected>"+data[i].name+"</option>");
+				}else {
+					$("#city").append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+				}
+			 }
+
+			 //选择省下拉框的时候进行三级联动
+			 district(data[0].id);
+
+			 form.render("select");
+		 });
+	 }
+
+
+	 function district(parentId,districtId){
+		 $.get("/userinfo/district",{pid:parentId},function (res) {
+			 var data= res.data;
+			 for (var i=0;i<data.length;i++) {
+			 	if (data[i].id==districtId){
+					$("#area").append("<option value='"+data[i].id+"' selected>"+data[i].name+"</option>");
+				}else {
+					$("#area").append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+				}
+			 }
+			 form.render("select");
+		 });
+	 }
+
+
+       //上传头像
+		upload.render({
+			elem:'.userFaceBtn',
+			url: '/file/uploadHeadImgFile',
+			method : "post",
+			acceptMime:'image/*',
+			field:'mf',
+			done: function(res, index, upload){
+				 var path=res.path;
+				 $(".userFaceBtn").attr("src","/file/showImageByPath?path="+path)
+				//给接收图片路径属性的input标签赋默认的路径
+				$("#headimg").val(path);
+			}
+		});
+
+
+		//提交修改信息
+		form.on('submit(changeUser)',function () {
+			 var data = $("#userForm").serialize();
+             $.post("/userinfo/updateUserInfo",data,function (res) {
+              if(res.code=200){
+              	layer.msg(res.msg);
+			  }
+		      return false;
+		  })
+		})
+
+
+	}) ;
+
+
+
+</script>
+</body>
+</html>

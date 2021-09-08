@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ch.warehouse.mapper.UserinfoMapper">
+  <resultMap id="BaseResultMap" type="com.ch.warehouse.entity.Userinfo">
+    <!--@mbg.generated-->
+    <!--@Table userinfo-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="true_name" jdbcType="VARCHAR" property="trueName" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="master_skill" jdbcType="VARCHAR" property="masterSkill" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="self_assessment" jdbcType="VARCHAR" property="selfAssessment" />
+    <result column="sex" jdbcType="INTEGER" property="sex" />
+    <result column="headimg" jdbcType="VARCHAR" property="headimg" />
+    <result column="birthday" jdbcType="VARCHAR" property="birthday" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, phone, true_name, address, master_skill, email, self_assessment, sex, headimg, 
+    birthday
+  </sql>
+</mapper>

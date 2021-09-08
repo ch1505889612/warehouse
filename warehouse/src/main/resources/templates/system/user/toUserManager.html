@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="/static/layui/css/layui.css">
+    <link rel="stylesheet" href="/static/layui_ext/dtree/dtree.css">
+    <link rel="stylesheet" href="/static/layui_ext/dtree/font/dtreefont.css">
+    <link rel="stylesheet" href="/static/css/public.css" media="all" />
+</head>
+<body class="main_body" style="margin-left: 2px">
+<div class="layui-row layui-col-space10  layui-fluid">
+    
+        <!--查询条件区域-->
+        <blockquote class="layui-elem-quote">
+            <form class="layui-form  layui-form-pane" action="" id="searchFrm" lay-filter="searchFrm" method="post">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">所属部门</label>
+                        <div class="layui-input-inline">
+                            <input type="hidden" name="deptid" id="search_deptid">
+                            <ul id="search_deptTree" class="dtree" data-id="0"></ul>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">用户名称</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="name"   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">用户地址</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="address"   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline" style="margin-left:20px">
+                        <div class="layui-input-block" >
+                            <button  type="button" class="layui-btn  layui-btn-lg"  lay-submit lay-filter="doSerach"><span class="layui-icon layui-icon-search"></span>搜索</button>
+                            <button  type="reset" onclick="javascript:document.getElementById('search_deptid').value=''"  class="layui-btn  layui-btn-lg  layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </blockquote>
+        <div>
+            <table class="layui--hide" id="userTable" lay-filter="userTable"></table>
+            <div id="userToolBar" style="display: none">
+                <button type="button" class="layui-btn layui-bg-blue" lay-event="add"><span class="layui-icon layui-icon-add-1"></span>添加用户</button>
+            </div>
+            <div id="userRowBar" style="display:none;">
+                <button  type="button"  class="layui-btn layui-btn-xs layui-bg-red" lay-event="Delete"><span class="layui-icon layui-icon-delete"></span>删除</button>
+                <button  type="button"  class="layui-btn layui-btn-xs layui-bg-orange" lay-event="update"><span class="layui-icon layui-icon-edit"></span>更新</button>
+                <button  type="button"  class="layui-btn layui-btn-xs layui-bg-orange" lay-event="resetPwd"><span class="layui-icon layui-icon-edit"></span>重置密码</button>
+                <button  type="button"  class="layui-btn layui-btn-xs layui-bg-orange" lay-event="allocationRole"><span class="layui-icon layui-icon-edit"></span>分配角色</button>
+            </div>
+        </div>
+    <!--添加和修改的弹出层-->
+    <div style="display: none;padding: 5px" id="addOrUpdateDiv" class="">
+        <form action="" method="post" class="layui-form layui-form-pane" id="dataFrm" lay-filter="dataFrm">
+            <input name="id" type="hidden">
+            <div class="layui-form-item">
+                <label class="layui-form-label">部门</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" name="deptid" id="deptid">
+                    <ul id="selTree1" class="dtree" data-id="0"></ul>
+                </div>
+                <label class="layui-form-label">排序码</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="ordernum" lay-verify="required|number" id="ordernum" placeholder="请输入排序码[>0]" class="layui-input">
+                </div>
+
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">领导部门</label>
+                <div class="layui-input-inline">
+                    <ul id="leaderdeptTree" class="dtree" data-id="0"></ul>
+                </div>
+
+                <label class="layui-form-label">直属领导</label>
+                <div class="layui-input-inline">
+                    <select name="mgr" id="mgr">
+                        <option value="0">请选择直属领导</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" required  lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+                </div>
+                <label class="layui-form-label">登录名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="loginname" id="loginname" required  lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户地址</label>
+                <div class="layui-input-block">
+                    <input type="text" name="address" required  lay-verify="required" placeholder="请输入地址" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">用户备注</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" name="remark" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">用户性别</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="sex" value="1" title="男" checked/>
+                    <input type="radio" name="sex" value="0" title="女" />
+                </div>
+                <label class="layui-form-label">是否可用</label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="available" value="1" title="可用" checked/>
+                    <input type="radio" name="available" value="0" title="不可用" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="text-align: center">
+                    <button  type="button" class="layui-btn  layui-btn-lg" lay-filter="doSubmit"  lay-submit id="doSubmit"><span class="layui-icon layui-icon-search"></span>提交</button>
+                    <button  type="reset"  onclick="javascript:document.getElementById('deptid').value=''" class="layui-btn  layui-btn-lg  layui-btn layui-btn-warm"><span class="layui-icon layui-icon-refresh-1"></span>重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--分配角色弹出层-->
+<div style="display: none;padding: 5px" id="selectUserRoleDiv">
+    <table class="layui--hide" id="roleTable" lay-filter="roleTable"></table>
+</div>
+
+<script type="text/html" id="switchAvailable">
+    <!-- 这里的 checked 的状态只是演示 -->
+    {{#  if(d.available==1){ }}
+    <input type="checkbox" checked  name="available" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="available" />
+    {{#  } else { }}
+    <input type="checkbox" name="available" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="available" />
+    {{#  } }}
+</script>
+<script type="text/html" id="switchOpen">
+    <!-- 这里的 checked 的状态只是演示 -->
+    {{#  if(d.open==1){ }}
+    <input type="checkbox" checked  name="open" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="open" />
+    {{#  } else { }}
+    <input type="checkbox" name="open" value="{{d.id}}" lay-skin="switch" lay-text="是|否" lay-filter="open" />
+    {{#  } }}
+</script>
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script type="text/javascript" th:inline="none">
+
+    layui.config({
+        base: '/static/layui_ext/dtree/'   // {/}的意思即代表采用自有路径，即不跟随 base 路径
+    }).extend({
+        dtree: 'dtree'//定义组件模块名
+    }).use(['dtree','layer','jquery','form','table'], function() {
+        var dtree = layui.dtree;
+        var layer = layui.layer;
+        $ = layui.jquery;
+        var form = layui.form;
+        var table = layui.table;
+
+
+        //加载数据
+        var userTable = table.render({
+            elem: '#userTable'
+            , url: '/user/loadAllUser'
+            , toolbar: '#userToolBar' //开启头部工具栏,并为其绑定左侧模板
+            , title: '用户登录日志数据表'
+            , page: true //开启分页
+            , limits: [10, 20, 50, 100]
+            , cols: [[
+                {field: 'id', title: 'ID', align: 'center', sort: true, width: '100'},
+                {field: 'name', title: '用户姓名', align: 'center', sort: true, width: '100'},
+                {field: 'loginname', title: '登录名称', align: 'center', sort: true, width: '150'},
+                {field: 'remark', title: '用户备注', align: 'center', sort: true, width: '150'},
+                {field: 'sex', title: '性别', align: 'center', sort: true, width: '50',templet: function (d) {
+                    return d.sex==1?'<span color=blue>男</span>':'<span color="red">女</span>'
+                    }},
+                {field: 'deptname', title: '部门名称', align: 'center', sort: true, width: '100'},
+                {field: 'address', title: '用户地址', align: 'center', sort: true, width: '100'},
+                {field: 'leadername', title: '直属领导', align: 'center', sort: true, width: '100'},
+                {field: 'hiredate', title: '入职时间', align: 'center', sort: true, width: '150',templet: '<div>{{ layui.util.toDateString(d.hiredate, "yyyy-MM-dd HH:mm:ss") }}</div>'},
+                {
+                    field: 'available',
+                    title: '是否可用',
+                    align: 'center',
+                    sort: true,
+                    width: '150',
+                    templet: '#switchAvailable'
+                },
+                {field: 'ordernum', title: '排序码', align: 'center', sort: true, width: '100'},
+                {
+                    field: 'imgpath',
+                    title: '头像',
+                    align: 'center',
+                    sort: true,
+                    width: '200',
+                },
+                {fixed: 'right', title: '操作', toolbar: '#userRowBar', width: 350},
+            ]],
+            //处理删除谋一项最后一条数据的bug
+            done:function (res,curr,count) {
+                //如果是异步请求数据方式,res即为接口的返回信息
+                // 如果是直接赋值的方式,res即为:{data:[],count:99},data为当前页数据、count为数据总长度
+                console.log(res);
+                //得到当前页码
+                console.log(curr);
+                //得到数据总量
+                console.log(count);
+
+                if (res.data.length==0&&curr!=1){
+                    userTable.reload({
+                        page:{
+                            curr:(curr-1)
+                        }
+                    })
+                }
+            }
+        });
+
+
+
+
+
+        //模糊查询
+        form.on('submit(doSerach)', function (data) {
+            userTable.reload({
+                where: data.field,
+                page: {
+                    curr: 1
+                }
+            });
+            return false;
+        });
+
+        //监听行工具条的事件
+        table.on("tool(userTable)", function (obj) {
+            var data = obj.data; //获得当前行数据
+            switch (obj.event) {
+                case 'Delete':
+                    deleteUser(data);
+                    break;
+                case 'update':
+                    openUpdateUserLayer(data);
+                    break;
+                    case 'resetPwd':
+                        resetPwd(data);
+                case 'allocationRole':
+                     allocationRole(data);
+                     break;
+            }
+        });
+
+
+
+
+        //监听行工具事件
+        table.on('toolbar(userTable)', function (obj) {
+            switch (obj.event) {
+                case 'add':
+                    openAddLayer();
+                    break;
+            }
+        });
+
+        var mainIndex;
+        var url;
+
+        //初始化查询树
+        var searchdeptTree = dtree.renderSelect({
+            elem: "#search_deptTree",
+            dataStyle: "layuiStyle", //使用layui风格的数据格式
+            dataFormat: "list", //配置data的风格
+            url: "/dept/loadDeptManagerLeftTreeJson", // 使用url加载（可与data加载同时存在）
+            response: {message: "msg", statusCode: 0},//修改response中返回数据的定义
+        });
+
+
+        //绑定节点点击
+        dtree.on("node('search_deptTree')", function (obj) {
+            //点击当前节点传递的值
+            $("#search_deptid").val(obj.param.nodeId);
+        })
+
+        // 初始化弹出层所属部门的下拉列表
+        var dtreeSelect=  dtree.renderSelect({
+              elem: "#selTree1",
+              width: "100%", // 指定树的宽度
+              dataStyle: "layuiStyle", //使用layui风格的数据格式
+              dataFormat: "list", //配置data的风格
+              response: {message: "msg", statusCode: 0},
+              url: "/dept/loadDeptManagerLeftTreeJson"
+          });
+
+        //监听弹出层点击下拉树的方法
+        dtree.on("node(selTree1)",function (obj) {
+            $("#deptid").val(obj.param.nodeId);
+        })
+
+
+        // 初始化弹出层所属领导部门的下拉树
+        var leaderDtree=  dtree.renderSelect({
+            elem: "#leaderdeptTree",
+            width: "100%", // 指定树的宽度
+            dataStyle: "layuiStyle", //使用layui风格的数据格式
+            dataFormat: "list", //配置data的风格
+            response: {message: "msg", statusCode: 0},
+            url: "/dept/loadDeptManagerLeftTreeJson"
+        });
+
+        //监听弹出层点击下拉树的方法
+        dtree.on("node(leaderdeptTree)",function (obj) {
+         var deptid= obj.param.nodeId;
+         //根据部门id查询当前部门下面的领导列表
+            $.get("/user/loadUsersByDeptId",{deptid:deptid},function (res) {
+             var users=res.data;
+             var dom_mgr=$("#mgr");
+             var html="<option value='0'>请选择直属领导</option>";
+             $.each(users,function (index,item) {
+             html+="<option value='"+item.id+"'>"+item.name+"</option>";
+             });
+             dom_mgr.html(html);
+                //重新渲染
+                form.render("select");
+            })
+        })
+
+
+
+        //打开添加的弹出层
+        function openAddLayer() {
+            mainIndex=layer.open({
+                type:1,
+                content:$("#addOrUpdateDiv"),
+                area:['800px','520px'],
+                title:'添加用户',
+                success:function () {
+                    $("#dataFrm")[0].reset();
+                    $("#deptid").val("");
+                    //初始化排序码
+                    $.get("/user/loadUserMaxOrderNum",function (res) {
+                        $("#ordernum").val(res.value);
+                    });
+
+                    var html="<option value='0'>请选择直属领导</option>";
+                    $("#mgr").html(html);
+                    //重新渲染
+                    form.render("select");
+                    url = "/user/addUser";
+                }
+            });
+
+        }
+
+        //判断用户名是否存在
+        // $("#loginname").on("blur",function () {
+        //    var loginname = $(this).val();
+        //    $.get("/user/loginnameIfExist",{loginname:loginname},function (res) {
+        //      layer.msg(res.msg);
+        //    })
+        // })
+
+        //打开修改的弹出层
+        function openUpdateUserLayer(data) {
+            mainIndex = layer.open({
+                type: 1,
+                content: $("#addOrUpdateDiv"),
+                area: ['800px', '520px'],
+                title: '修改用户',
+                success: function () {
+                    $("#dataFrm")[0].reset();
+                    // 初始化选中节点，并设值nodeId=data.pid
+                    dtree.dataInit("selTree1",data.deptid);
+                    //设置下拉树的初始展示值
+                    dtree.selectVal("selTree1");
+
+                    // 选中领导部门
+                    var leaderid=data.mgr;
+                    $.get("/user/loadUserById",{id:leaderid},function (res) {
+                        var d = res.data;
+                        dtree.dataInit("leaderdeptTree",d.deptid);
+                        dtree.selectVal("leaderdeptTree");
+                        $.get("/user/loadUsersByDeptId",{deptid:d.deptid},function (res) {
+                            var users=res.data;
+                            var dom_mgr=$("#mgr");
+                            var html="<option value='0'>请选择直属领导</option>";
+                            $.each(users,function (index,item) {
+                                html+="<option value='"+item.id+"'>"+item.name+"</option>";
+                            });
+                            dom_mgr.html(html);
+                            //选中一个值
+                            dom_mgr.val(leaderid);
+                            //重新渲染
+                            form.render("select");
+                        })
+                    })
+                    //给表单元素赋值
+                    form.val('dataFrm',data);
+                    url = "/user/updateUser";
+                }
+            });
+        }
+
+
+
+        //添加和修改
+        form.on('submit(doSubmit)',function () {
+            var data = $("#dataFrm").serialize();
+            $.post(url, data, function (res) {
+                if (res.code == 200) {
+                    userTable.reload();
+                }
+                layer.msg(res.msg);
+                layer.close(mainIndex);
+            });
+            return false;
+        });
+
+
+        //删除
+        function deleteUser(data) {
+            layer.confirm("你确定要删除这个用户吗", {icon: 3, title: '提示'}, function (index) {
+                $.post("/user/deleteUser", {id: data.id}, function (res) {
+                    if (res.code == 200) {
+                        userTable.reload();
+                    }
+                    layer.msg(res.msg);
+                    layer.close(index);
+                });
+                return false;
+            });
+        }
+
+        //重置密码
+        function resetPwd(data) {
+        layer.confirm('你确定要重置密码吗['+data.name+']这个用户密码吗?',{icon: 3,title:'提示'},function (index) {
+           $.post('/user/resetPwd',{id:data.id},function (res) {
+             layer.msg(res.msg);
+           })
+            layer.close(index);
+        })
+        }
+
+
+        //打开分配角色弹出层
+        function allocationRole(data) {
+            mainIndex=layer.open({
+                type:1,
+                content:$("#selectUserRoleDiv"),
+                area:['400px',"500px"],
+                title:'分配['+data.name+']的角色',
+                btn: ['<span class="layui-icon">&#xe605;确认分配</span>', '<span class="layui-icon">&#x1006;取消</span>'],
+                yes: function(index, layero){
+                    var checkStatus = table.checkStatus("roleTable");
+                    var params="uid="+data.id;
+                    $.each(checkStatus.data,function (index,item) {
+                        params +="&ids="+item.id;
+                    });
+                    $.post("/user/saveUserRole",params,function (res) {
+                        layer.msg(res.msg);
+                        layer.close(mainIndex);
+                    })
+                    return false;
+                }
+                ,btn2: function(index, layero){
+
+                },
+                btnAlign:'c',
+                success:function () {
+                 initRoleTable(data);
+                }
+            })
+        }
+
+        var roleTableIns;
+        //初始化角色列表
+        function initRoleTable(data) {
+             roleTableIns=table.render({
+                 elem: '#roleTable'
+                , url: '/user/initRoleTable',
+                 where:{
+                     id:data.id
+                 },
+                cols: [[
+                    {type: 'checkbox', fixed: 'left'},
+                    {field: 'id', title: 'ID', align: 'center', sort: true},
+                    {field: 'name', title: '角色姓名', align: 'center', sort: true},
+                    {field: 'remark', title: '角色权限', align: 'center', sort: true},
+                   ]]
+            });
+        }
+
+    });
+
+
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
