@@ -1,2 +1,3 @@
-[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=ch1505889612&repo=github-readme-stats)]
+![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=ch1505889612&show_icons=true&theme=cobalt&layout=compact)
+
 
